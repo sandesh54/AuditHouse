@@ -22,6 +22,10 @@ class TextFieldView: UIView {
         didSet { textField.keyboardType = keybordType }
     }
     
+    var text: String? {
+        return textField.text
+    }
+    
     // PRIVATE VARS
     private var textLabel: UILabel = {
         let lable           = UILabel()
@@ -30,7 +34,7 @@ class TextFieldView: UIView {
         return lable
     }()
     
-    var textField: UITextField = {
+    private var textField: UITextField = {
         let textField = UITextField()
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 15, height: 44))
         textField.leftView = paddingView
@@ -53,6 +57,7 @@ class TextFieldView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //MARK: - PRIVATE FUNCS
     private func setupView() {
         //TEXT LABEL
         addSubview(textLabel)
@@ -91,6 +96,12 @@ class TextFieldView: UIView {
             seperator.heightAnchor.constraint(equalToConstant: 1)
         ])
     }
+    
+    //MARK:- PUBLIC FUNCS
+    func hideKeyboard() {
+        textField.resignFirstResponder()
+    }
+    
 }
 
 extension TextFieldView: UITextFieldDelegate {
@@ -109,7 +120,10 @@ extension TextFieldView: UITextFieldDelegate {
     func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
         return true
     }
-
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+    }
 }
 
 
