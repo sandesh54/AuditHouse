@@ -10,6 +10,7 @@ import UIKit
 
 class HomeVC: UIViewController {
     
+    
     private var homeButton: BadgeButton {
         let button = BadgeButton()
         button.setTitle(nil, for: .normal)
@@ -21,7 +22,7 @@ class HomeVC: UIViewController {
     private var infoButton: BadgeButton {
         let button = BadgeButton()
         button.setTitle(nil, for: .normal)
-         button.contentMode = .scaleAspectFit
+        button.contentMode = .scaleAspectFit
         button.setImage(UIImage(named: "info"), for: .normal)
         return button
     }
@@ -29,15 +30,31 @@ class HomeVC: UIViewController {
     private var notificationButton: BadgeButton {
         let button = BadgeButton()
         button.setTitle(nil, for: .normal)
-         button.contentMode = .scaleAspectFit
+        button.contentMode = .scaleAspectFit
         button.setImage(UIImage(named: "bell"), for: .normal)
         return button
     }
+    
+    var headerView: UIView = { return UIView() }()
+    
+    private var tableView: UITableView  = {
+        let tableView               = UITableView()
+        tableView.rowHeight         = UITableView.automaticDimension
+        tableView.allowsSelection   = false
+        tableView.tableFooterView   = UIView()
+        tableView.register(NotificationCell.self, forCellReuseIdentifier: NotificationCell.identifier)
+        return tableView
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configureNavigationController()
         setupView()
+        
+        tableView.separatorStyle    = .none
+        tableView.delegate          = self
+        tableView.dataSource        = self
+
     }
     
     private func configureNavigationController() {
@@ -59,7 +76,7 @@ class HomeVC: UIViewController {
     }
     
     private func setupView() {
-        let headerView = getHeaderView()
+        setupHeaderView()
         view.addSubview(headerView)
         headerView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -68,10 +85,19 @@ class HomeVC: UIViewController {
             headerView.rightAnchor.constraint(equalTo: view.rightAnchor),
             headerView.heightAnchor.constraint(equalToConstant: 50)
         ])
+        
+        view.addSubview(tableView)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: 0),
+            tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0)
+        ])
     }
     
-    private func getHeaderView() -> UIView{
-        let headerView = UIView()
+    private func setupHeaderView() {
+        
         headerView.backgroundColor = Color.appTheme
         
         let stackView = UIStackView()
@@ -94,8 +120,6 @@ class HomeVC: UIViewController {
         stackView.addArrangedSubview(embedInView(infoButton))
         stackView.addArrangedSubview(embedInView(notificationButton))
         
-        
-        return headerView
     }
     
     func embedInView(_ button: BadgeButton) -> UIView{
@@ -113,6 +137,30 @@ class HomeVC: UIViewController {
         superView.backgroundColor = .clear
         return superView
     }
-    
+}
 
+extension HomeVC: UITableViewDataSource {
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 4
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard  let cell = tableView.dequeueReusableCell(withIdentifier: NotificationCell.identifier, for: indexPath) as? NotificationCell else {
+            return UITableViewCell()
+        }
+        cell.loadCell()
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension
+    }
+}
+
+extension HomeVC: UITableViewDelegate {
+    
 }

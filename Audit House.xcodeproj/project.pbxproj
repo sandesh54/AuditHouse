@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0209CE95243EEF62007DE632 /* NotificationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0209CE94243EEF62007DE632 /* NotificationCell.swift */; };
 		02502650243D76CC006BB91E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0250264F243D76CC006BB91E /* AppDelegate.swift */; };
 		02502652243D76CC006BB91E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02502651243D76CC006BB91E /* SceneDelegate.swift */; };
 		02502654243D76CC006BB91E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02502653243D76CC006BB91E /* ViewController.swift */; };
@@ -24,6 +25,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0209CE94243EEF62007DE632 /* NotificationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCell.swift; sourceTree = "<group>"; };
 		0250264C243D76CC006BB91E /* Audit House.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Audit House.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0250264F243D76CC006BB91E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		02502651243D76CC006BB91E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -53,6 +55,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0209CE96243EEF6A007DE632 /* TableViewCells */ = {
+			isa = PBXGroup;
+			children = (
+				0209CE94243EEF62007DE632 /* NotificationCell.swift */,
+			);
+			path = TableViewCells;
+			sourceTree = "<group>";
+		};
 		02502643243D76CC006BB91E = {
 			isa = PBXGroup;
 			children = (
@@ -78,6 +88,7 @@
 				02502671243DD7CA006BB91E /* ReviewMessageVC.swift */,
 				02502655243D76CC006BB91E /* Main.storyboard */,
 				02502673243DE030006BB91E /* HomeVC.swift */,
+				0209CE96243EEF6A007DE632 /* TableViewCells */,
 				02502660243D76CD006BB91E /* Info.plist */,
 				02502668243D7C88006BB91E /* Constants.swift */,
 				02502670243DB0E7006BB91E /* Extensions */,
@@ -190,6 +201,7 @@
 				02502674243DE030006BB91E /* HomeVC.swift in Sources */,
 				02502654243D76CC006BB91E /* ViewController.swift in Sources */,
 				02502667243D7A0B006BB91E /* TextFieldView.swift in Sources */,
+				0209CE95243EEF62007DE632 /* NotificationCell.swift in Sources */,
 				02502650243D76CC006BB91E /* AppDelegate.swift in Sources */,
 				0250266B243D9CE0006BB91E /* CheckBox.swift in Sources */,
 				0250266F243DB0E3006BB91E /* UIViewController+Extensions.swift in Sources */,
