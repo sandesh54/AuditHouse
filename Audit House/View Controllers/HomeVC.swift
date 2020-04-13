@@ -55,6 +55,7 @@ class HomeVC: UIViewController {
         tableView.delegate          = self
         tableView.dataSource        = self
 
+        getInfo()
     }
     
     private func configureNavigationController() {
@@ -136,6 +137,29 @@ class HomeVC: UIViewController {
         
         superView.backgroundColor = .clear
         return superView
+    }
+    
+    private func getInfo() {
+        let parameters = [
+            "imei": UIDevice.UDID
+        ]
+        
+        Network.request(.checkDevice, parameters: parameters) { data, response, error in
+            if error == nil, data != nil {
+                let decoder = JSONDecoder()
+                print(String(data: data!, encoding: .utf8))
+                guard let apiResponse = try? decoder.decode(APIResponse.self, from: data!) else {
+                    //handle response failure
+                    return
+                }
+                print(apiResponse)
+                if apiResponse.msg == Constants.DEVICE_NOT_REGISTERED_MESSAGE {
+                   
+                }
+            } else {
+                #warning("handle error")
+            }
+        }
     }
 }
 

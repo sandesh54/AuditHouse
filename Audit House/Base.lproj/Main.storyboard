@@ -7,10 +7,30 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
+        <!--Check StatusVC-->
+        <scene sceneID="wo4-oY-Fzv">
+            <objects>
+                <viewController modalPresentationStyle="fullScreen" id="c9a-g8-umT" customClass="CheckStatusVC" customModule="Audit_House" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="16O-DY-N2g">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="BH6-sG-xiL"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="CFr-pZ-g9Z"/>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="show" identifier="registrationScreen" id="gRZ-fv-DHa"/>
+                        <segue destination="CeP-JK-h4O" kind="show" identifier="homeScreen" id="qAT-tz-KOp"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Lws-Hh-as8" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="177" y="118"/>
+        </scene>
         <!--RegistrationVC-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="RegistrationVC" customModule="Audit_House" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController modalPresentationStyle="fullScreen" id="BYZ-38-t0r" customClass="RegistrationVC" customModule="Audit_House" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -18,18 +38,15 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="Saz-7S-i5V"/>
-                    <connections>
-                        <segue destination="CeP-JK-h4O" kind="show" identifier="goToHome" id="J9d-Kd-lpC"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="614" y="118"/>
+            <point key="canvasLocation" x="923" y="-245"/>
         </scene>
         <!--HomeVC-->
         <scene sceneID="g86-0y-E1r">
             <objects>
-                <viewController id="CeP-JK-h4O" customClass="HomeVC" customModule="Audit_House" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController modalPresentationStyle="fullScreen" id="CeP-JK-h4O" customClass="HomeVC" customModule="Audit_House" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="dyj-hg-F2F">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -40,7 +57,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ptc-vv-6Xe" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1859.4202898550725" y="117.85714285714285"/>
+            <point key="canvasLocation" x="922" y="579"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="ezI-ke-Zy7">
@@ -53,7 +70,7 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="pfr-k5-deL"/>
+                        <segue destination="c9a-g8-umT" kind="relationship" relationship="rootViewController" id="fKW-9U-qW6"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xjt-fx-8Xf" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

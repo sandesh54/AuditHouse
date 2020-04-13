@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  RegistrationVC.swift
 //  Audit House
 //
 //  Created by Sandesh on 08/04/20.
@@ -62,7 +62,7 @@ class RegistrationVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
-        navigationController?.setNavigationBarHidden(false, animated: true)
+        navigationController?.setNavigationBarHidden(true, animated: true)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -221,15 +221,58 @@ class RegistrationVC: UIViewController {
         contactNumberField.hideKeyboard()
         firmNameField.hideKeyboard()
         
-        //Validate info
-//        let reviewMessageVC = ReviewMessageVC()
-//        reviewMessageVC.modalPresentationStyle = .fullScreen
-//        present(reviewMessageVC,animated: true)
-        
-        performSegue(withIdentifier: "goToHome", sender: self)
+        validateAndRegisterUser()
         
     }
     
+    private func validateAndRegisterUser(){
+        
+        guard  let userName = userNameField.text?.trimmingCharacters(in: .whitespacesAndNewlines), userName.count > 0 else {
+            showFormError(title: "Error!", message: "Please Enter User Name")
+            return
+        }
+        
+        guard let contactNumber = contactNumberField.text?.trimmingCharacters(in: .whitespacesAndNewlines), contactNumber.count > 0 else {
+            showFormError(title: "Error!", message: "Please Enter Contact Number")
+            return
+        }
+        
+        guard contactNumber.isValidContactNumber() else {
+            showFormError(title: "Error!", message: "Invalid Contact Number")
+            return
+        }
+        
+        guard  let firmName = firmNameField.text?.trimmingCharacters(in: .whitespacesAndNewlines), firmName.count > 0 else {
+            showFormError(title: "Error!", message: "Please Enter Firm Name")
+            return
+        }
+        
+        
+        let parametes = [
+            "imei": UIDevice.UDID,
+            "fcmId": UserDefaults.standard.string(forKey: Constants.DEVICE_TOKEN_KEY) ?? "",
+            "model":UIDevice.current.model,
+            "name": userName,
+            "contact": contactNumber,
+            "firm": firmName
+        ]
+        
+         
+        Network.request(.addDevice, parameters: parametes) { data, response, error in
+            if error != nil {
+                
+            }
+        }
+    }
+    
+    
+    private func showFormError(title: String, message: String){
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    
+  
     
     override func adjustForKeyboard(notification: Notification) {
         guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
