@@ -31,19 +31,22 @@ class CheckStatusVC: UIViewController {
                 let decoder = JSONDecoder()
                 guard let apiResponse = try? decoder.decode(APIResponse.self, from: data!) else {
                     //handle response failure
+                    print(false)
                     return
                 }
                 print(apiResponse)
                 if apiResponse.msg == Constants.DEVICE_NOT_REGISTERED_MESSAGE {
                     self.performSegue(withIdentifier: self.registrationSegueway, sender: self)
                 } else if apiResponse.msg == Constants.DEVICE_NOT_ACTIVATED_MESSAGE {
-//                    let message = ReviewMessageVC()
-//                    message.modalPresentationStyle = .fullScreen
-//                    present(message, animated:  true)
+                    let message = ReviewMessageVC()
+                    message.modalPresentationStyle = .fullScreen
+                    self.present(message, animated:  true)
+                }else if apiResponse.msg == Constants.REGISTRATION_SUCCESS_MESSAGE {
                     self.performSegue(withIdentifier: self.homeScreenSegueway, sender: self)
                 }
+                 
             } else {
-                #warning("handle error")
+                self.showNetworkError()
             }
         }
     }

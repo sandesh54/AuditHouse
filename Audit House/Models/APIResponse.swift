@@ -11,4 +11,6 @@ import Foundation
 struct APIResponse: Codable {
     var status: String
     var msg: String
+    var data: User?
+    var result: Count?
 }

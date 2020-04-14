@@ -228,22 +228,22 @@ class RegistrationVC: UIViewController {
     private func validateAndRegisterUser(){
         
         guard  let userName = userNameField.text?.trimmingCharacters(in: .whitespacesAndNewlines), userName.count > 0 else {
-            showFormError(title: "Error!", message: "Please Enter User Name")
+            showAlert(title: "Error!", message: "Please Enter User Name")
             return
         }
         
         guard let contactNumber = contactNumberField.text?.trimmingCharacters(in: .whitespacesAndNewlines), contactNumber.count > 0 else {
-            showFormError(title: "Error!", message: "Please Enter Contact Number")
+            showAlert(title: "Error!", message: "Please Enter Contact Number")
             return
         }
         
         guard contactNumber.isValidContactNumber() else {
-            showFormError(title: "Error!", message: "Invalid Contact Number")
+            showAlert(title: "Error!", message: "Invalid Contact Number")
             return
         }
         
         guard  let firmName = firmNameField.text?.trimmingCharacters(in: .whitespacesAndNewlines), firmName.count > 0 else {
-            showFormError(title: "Error!", message: "Please Enter Firm Name")
+            showAlert(title: "Error!", message: "Please Enter Firm Name")
             return
         }
         
@@ -256,22 +256,18 @@ class RegistrationVC: UIViewController {
             "contact": contactNumber,
             "firm": firmName
         ]
-        
-         
         Network.request(.addDevice, parameters: parametes) { data, response, error in
-            if error != nil {
-                
+            if error == nil, data != nil {
+                let decoder = JSONDecoder()
+                guard let apiResponse = try? decoder.decode(APIResponse.self, from: data!) else {
+                    return
+                }
+                print(apiResponse)
+            } else {
+                self.showNetworkError()
             }
         }
     }
-    
-    
-    private func showFormError(title: String, message: String){
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
-    }
-    
   
     
     override func adjustForKeyboard(notification: Notification) {

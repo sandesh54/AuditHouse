@@ -50,6 +50,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let token = deviceToken.tokenString
+        print("Push Notification Token: \(token)")
         UserDefaults.standard.set(token, forKey: Constants.DEVICE_TOKEN_KEY)
     }
 }

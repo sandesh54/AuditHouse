@@ -29,6 +29,9 @@
 		02726FBB24443CC400C44DB8 /* APIResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02726FBA24443CC400C44DB8 /* APIResponse.swift */; };
 		02726FBE2444596400C44DB8 /* Data+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02726FBD2444596400C44DB8 /* Data+Extension.swift */; };
 		02726FC024445B4900C44DB8 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02726FBF24445B4900C44DB8 /* String+Extension.swift */; };
+		02E614BB24457D93005AA1B6 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E614BA24457D93005AA1B6 /* User.swift */; };
+		02E614BD24458D8F005AA1B6 /* Count.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E614BC24458D8F005AA1B6 /* Count.swift */; };
+		02E614C224459588005AA1B6 /* AboutUsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02E614C124459588005AA1B6 /* AboutUsVC.swift */; };
 		8296265E25C7DD1098E280A2 /* libPods-Audit House.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D7DF96024030A77CCACB698A /* libPods-Audit House.a */; };
 /* End PBXBuildFile section */
 
@@ -57,6 +60,9 @@
 		02726FBA24443CC400C44DB8 /* APIResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIResponse.swift; sourceTree = "<group>"; };
 		02726FBD2444596400C44DB8 /* Data+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Extension.swift"; sourceTree = "<group>"; };
 		02726FBF24445B4900C44DB8 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
+		02E614BA24457D93005AA1B6 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		02E614BC24458D8F005AA1B6 /* Count.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Count.swift; sourceTree = "<group>"; };
+		02E614C124459588005AA1B6 /* AboutUsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutUsVC.swift; sourceTree = "<group>"; };
 		203A28CAAF9C323FB082936E /* Pods-Audit House.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Audit House.release.xcconfig"; path = "Target Support Files/Pods-Audit House/Pods-Audit House.release.xcconfig"; sourceTree = "<group>"; };
 		D7DF96024030A77CCACB698A /* libPods-Audit House.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Audit House.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FDDF5AAB8FD5C20ECE649389 /* Pods-Audit House.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Audit House.debug.xcconfig"; path = "Target Support Files/Pods-Audit House/Pods-Audit House.debug.xcconfig"; sourceTree = "<group>"; };
@@ -120,6 +126,7 @@
 		0250266C243DB08D006BB91E /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				02E614BE24459497005AA1B6 /* CustomAlert */,
 				02502666243D7A0B006BB91E /* TextFieldView.swift */,
 				0250266A243D9CE0006BB91E /* CheckBox.swift */,
 				02502675243DE6BA006BB91E /* BadgeButton.swift */,
@@ -166,6 +173,7 @@
 				02502653243D76CC006BB91E /* RegistrationVC.swift */,
 				02502673243DE030006BB91E /* HomeVC.swift */,
 				02726FB62444274B00C44DB8 /* CheckStatusVC.swift */,
+				02E614C124459588005AA1B6 /* AboutUsVC.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -174,8 +182,17 @@
 			isa = PBXGroup;
 			children = (
 				02726FBA24443CC400C44DB8 /* APIResponse.swift */,
+				02E614BA24457D93005AA1B6 /* User.swift */,
+				02E614BC24458D8F005AA1B6 /* Count.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		02E614BE24459497005AA1B6 /* CustomAlert */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = CustomAlert;
 			sourceTree = "<group>";
 		};
 		C6BCEBE4324678094A703B02 /* Frameworks */ = {
@@ -300,8 +317,11 @@
 				02726FB72444274B00C44DB8 /* CheckStatusVC.swift in Sources */,
 				02726FBB24443CC400C44DB8 /* APIResponse.swift in Sources */,
 				02502654243D76CC006BB91E /* RegistrationVC.swift in Sources */,
+				02E614BB24457D93005AA1B6 /* User.swift in Sources */,
 				02502667243D7A0B006BB91E /* TextFieldView.swift in Sources */,
+				02E614C224459588005AA1B6 /* AboutUsVC.swift in Sources */,
 				0209CE95243EEF62007DE632 /* NotificationCell.swift in Sources */,
+				02E614BD24458D8F005AA1B6 /* Count.swift in Sources */,
 				02502650243D76CC006BB91E /* AppDelegate.swift in Sources */,
 				02726FB9244428FE00C44DB8 /* UIDevice+Extension.swift in Sources */,
 				0250266B243D9CE0006BB91E /* CheckBox.swift in Sources */,

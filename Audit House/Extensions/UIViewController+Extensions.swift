@@ -23,4 +23,15 @@ extension UIViewController {
     @objc func adjustForKeyboard(notification: Notification) {
         
     }
+    
+    func showAlert(title: String, message: String){
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    
+    func showNetworkError() {
+         showAlert(title: "Error!", message: "Something went wrong, please check your internet connection or try after some time.")
+    }
+    
 }

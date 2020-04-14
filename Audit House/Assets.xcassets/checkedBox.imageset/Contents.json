@@ -1,17 +1,8 @@
 {
   "images" : [
     {
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
-      "filename" : "icons8-checked-checkbox-30-2.png",
-      "idiom" : "universal",
-      "scale" : "2x"
-    },
-    {
-      "idiom" : "universal",
-      "scale" : "3x"
+      "filename" : "Check Box.pdf",
+      "idiom" : "universal"
     }
   ],
   "info" : {

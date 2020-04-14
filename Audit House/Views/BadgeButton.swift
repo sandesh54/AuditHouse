@@ -12,8 +12,8 @@ import UIKit
 class BadgeButton: UIButton {
     
     @IBInspectable
-    var badgeText: String = "89232" {
-        didSet { setupViews() }
+    var badgeText: String = "" {
+        didSet { badgeLabel.text = badgeText  }
     }
     
     @IBInspectable
@@ -27,11 +27,11 @@ class BadgeButton: UIButton {
     }
     
     @IBInspectable
-    var isBadgeHidden:Bool = true {
+    var isBadgeHidden:Bool = false {
         didSet {
             if isBadgeHidden {
                 badgeLabel.isHidden = true
-                
+                setupViews()
             } else {
                 badgeLabel.isHidden = false
                 setupViews()
@@ -82,9 +82,10 @@ class BadgeButton: UIButton {
             badgeLabel.leftAnchor.constraint(equalTo: rightAnchor, constant: rightAnchorSpacing),
             badgeLabel.topAnchor.constraint(equalTo: topAnchor, constant: -topAnchorSpacing),
             badgeLabel.heightAnchor.constraint(equalToConstant: 20),
-            badgeLabel.widthAnchor.constraint(equalToConstant: badgeLabel.intrinsicContentSize.width + 8)
         ])
         
+        let badgeLabelWidthConstraint = NSLayoutConstraint(item: badgeLabel, attribute: .width, relatedBy: .greaterThanOrEqual, toItem: badgeLabel, attribute: .height, multiplier: 1, constant: 0)
+        badgeLabelWidthConstraint.isActive = true
     }
     
     func setSelected(_ selected: Bool, animated: Bool) {

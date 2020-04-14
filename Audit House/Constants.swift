@@ -23,6 +23,8 @@ struct Constants {
     
     static let REGISTRATION_SUCCESS_MESSAGE = "success"
     static let REGISTRATION_FAILED_MESSAGE = "fail"
+    
+    static let NO_INFO_FOUND_MESSAGE = "No results found"
 }
 
 

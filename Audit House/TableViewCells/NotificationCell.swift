@@ -136,7 +136,6 @@ class NotificationCell: UITableViewCell {
         
         let shadowView = UIView(frame: cardView.bounds)
         shadowView.layer.cornerRadius = 8
-        shadowView.backgroundColor = .red
         insertSubview(shadowView, at: 0)
         shadowView.center = cardView.center
         
@@ -147,10 +146,10 @@ class NotificationCell: UITableViewCell {
         path.close()
         
         shadowView.layer.shadowPath =  path.cgPath //UIBezierPath(rect: shadowView.bounds).cgPath
-        shadowView.layer.shadowColor = Color.appTheme.cgColor
+        shadowView.layer.shadowColor = Color.darkText.cgColor
         shadowView.layer.shadowRadius = 8
         shadowView.layer.shadowOffset = CGSize(width: 2.0, height: 2.0)
-        shadowView.layer.shadowOpacity = 1
+        shadowView.layer.shadowOpacity = 0.33
         
     }
     

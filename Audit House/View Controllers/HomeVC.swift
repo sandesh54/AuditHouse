@@ -11,31 +11,36 @@ import UIKit
 class HomeVC: UIViewController {
     
     
-    private var homeButton: BadgeButton {
+    private var homeButton: BadgeButton = {
         let button = BadgeButton()
         button.setTitle(nil, for: .normal)
         button.contentMode = .scaleAspectFit
         button.setImage(UIImage(named: "home"), for: .normal)
+        button.addTarget(self, action: #selector(homeButtonTapped(_:)), for: .touchUpInside)
         return button
-    }
+    }()
     
-    private var infoButton: BadgeButton {
+    private var infoButton: BadgeButton = {
         let button = BadgeButton()
         button.setTitle(nil, for: .normal)
         button.contentMode = .scaleAspectFit
         button.setImage(UIImage(named: "info"), for: .normal)
+        button.addTarget(self, action: #selector(infoButtonTapped(_:)), for: .touchUpInside)
         return button
-    }
+    }()
     
-    private var notificationButton: BadgeButton {
+    private var notificationButton: BadgeButton = {
         let button = BadgeButton()
         button.setTitle(nil, for: .normal)
         button.contentMode = .scaleAspectFit
         button.setImage(UIImage(named: "bell"), for: .normal)
+        button.addTarget(self, action: #selector(notificationButtonTapped(_:)), for: .touchUpInside)
         return button
-    }
+    }()
     
-    var headerView: UIView = { return UIView() }()
+    var headerView: UIView = {
+        return UIView()
+    }()
     
     private var tableView: UITableView  = {
         let tableView               = UITableView()
@@ -54,8 +59,7 @@ class HomeVC: UIViewController {
         tableView.separatorStyle    = .none
         tableView.delegate          = self
         tableView.dataSource        = self
-
-        getInfo()
+        readCounts()
     }
     
     private func configureNavigationController() {
@@ -73,7 +77,7 @@ class HomeVC: UIViewController {
         label.textColor = .white
         label.text = "Audit House"
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: label)
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .organize, target: nil, action: nil)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "About Us", style: .plain, target: self, action: #selector(showAboutUs))
     }
     
     private func setupView() {
@@ -87,6 +91,7 @@ class HomeVC: UIViewController {
             headerView.heightAnchor.constraint(equalToConstant: 50)
         ])
         
+      
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -98,7 +103,7 @@ class HomeVC: UIViewController {
     }
     
     private func setupHeaderView() {
-        
+
         headerView.backgroundColor = Color.appTheme
         
         let stackView = UIStackView()
@@ -139,15 +144,38 @@ class HomeVC: UIViewController {
         return superView
     }
     
+    
+    //MARK:- CLASS METHODS
+    private func readCounts() {
+        let parameters = [
+            "user_id": "1"
+        ]
+        Network.request(.readCount, parameters: parameters) { data, response, error in
+            if error == nil, data != nil {
+                let decoder = JSONDecoder()
+                guard let apiResponse = try? decoder.decode(APIResponse.self, from: data!) else {
+                    return
+                }
+                print(apiResponse)
+                if apiResponse.result != nil {
+                    self.homeButton.badgeText = "\(apiResponse.result!.reminder)"
+                    self.infoButton.badgeText = apiResponse.result!.impInfo
+                    self.notificationButton.badgeText = apiResponse.result!.notification
+                }
+                self.getInfo()
+            } else {
+                self.showNetworkError()
+            }
+        }
+    }
+    
     private func getInfo() {
         let parameters = [
             "imei": UIDevice.UDID
         ]
-        
-        Network.request(.checkDevice, parameters: parameters) { data, response, error in
+        Network.request(.getInfo, parameters: parameters) { data, response, error in
             if error == nil, data != nil {
                 let decoder = JSONDecoder()
-                print(String(data: data!, encoding: .utf8))
                 guard let apiResponse = try? decoder.decode(APIResponse.self, from: data!) else {
                     //handle response failure
                     return
@@ -157,10 +185,68 @@ class HomeVC: UIViewController {
                    
                 }
             } else {
-                #warning("handle error")
+                self.showNetworkError()
             }
         }
     }
+    
+    
+    @objc private func homeButtonTapped(_ sender: UIButton) {
+       getInfo()
+    }
+    
+    @objc private func infoButtonTapped(_ sender: UIButton) {
+        let parameters = [
+            "imei": UIDevice.UDID
+        ]
+        
+        Network.request(.getReminders, parameters: parameters) { data, response, error in
+            if error == nil, data != nil {
+                let decoder = JSONDecoder()
+                guard let apiResponse = try? decoder.decode(APIResponse.self, from: data!) else {
+                    //handle response failure
+                    return
+                }
+                print(apiResponse)
+                if apiResponse.msg == Constants.DEVICE_NOT_REGISTERED_MESSAGE {
+                   
+                }
+            } else {
+                self.showNetworkError()
+            }
+        }
+    }
+    
+    @objc private func notificationButtonTapped(_ sender: UIButton) {
+        let parameters = [
+            "imei": UIDevice.UDID
+        ]
+        
+        Network.request(.getNotifications, parameters: parameters) { data, response, error in
+            if error == nil, data != nil {
+                let decoder = JSONDecoder()
+                guard let apiResponse = try? decoder.decode(APIResponse.self, from: data!) else {
+                    //handle response failure
+                    return
+                }
+                print(apiResponse)
+                if apiResponse.msg == Constants.DEVICE_NOT_REGISTERED_MESSAGE {
+                   
+                }
+            } else {
+                self.showNetworkError()
+            }
+        }
+    }
+    
+    @objc private func showAboutUs() {
+        let abtUS = AboutUsVC()
+        abtUS.modalPresentationStyle = .overFullScreen
+        abtUS.modalTransitionStyle = .crossDissolve
+        self.present(abtUS, animated: true)
+    }
+    
+    
 }
 
 extension HomeVC: UITableViewDataSource {
