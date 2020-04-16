@@ -14,6 +14,7 @@ import UserNotifications
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        _ = Reachabiility.shared
         application.registerForRemoteNotifications()
         UNUserNotificationCenter.current().delegate = self
         return true
@@ -25,7 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     lazy var persistentContainer: NSPersistentContainer = {
 
-        let container = NSPersistentContainer(name: "Audit_House")
+        let container = NSPersistentContainer(name: "AuditHouse")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
@@ -51,7 +52,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let token = deviceToken.tokenString
         print("Push Notification Token: \(token)")
-        UserDefaults.standard.set(token, forKey: Constants.DEVICE_TOKEN_KEY)
+        UserDefaults.standard.set(token, forKey: UserDefaultsKeys.DEVICE_TOKEN_KEY)
     }
 }
 

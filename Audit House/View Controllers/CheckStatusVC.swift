@@ -22,33 +22,20 @@ class CheckStatusVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         
-        let parameters = [
-            "imei": UIDevice.UDID
-        ]
-        
-        Network.request(.checkDevice, parameters: parameters) { data, response, error in
-            if error == nil, data != nil {
-                let decoder = JSONDecoder()
-                guard let apiResponse = try? decoder.decode(APIResponse.self, from: data!) else {
-                    //handle response failure
-                    print(false)
-                    return
-                }
-                print(apiResponse)
-                if apiResponse.msg == Constants.DEVICE_NOT_REGISTERED_MESSAGE {
+            CheckDeviceApiCall.async { status in
+                switch status {
+                case .notRegistered:
                     self.performSegue(withIdentifier: self.registrationSegueway, sender: self)
-                } else if apiResponse.msg == Constants.DEVICE_NOT_ACTIVATED_MESSAGE {
+                case .notActivated:
                     let message = ReviewMessageVC()
                     message.modalPresentationStyle = .fullScreen
                     self.present(message, animated:  true)
-                }else if apiResponse.msg == Constants.REGISTRATION_SUCCESS_MESSAGE {
+                case .success:
                     self.performSegue(withIdentifier: self.homeScreenSegueway, sender: self)
+                case .error:
+                    self.showNetworkError()
                 }
-                 
-            } else {
-                self.showNetworkError()
-            }
-        }
+            }        
     }
     
     private func setupView() {

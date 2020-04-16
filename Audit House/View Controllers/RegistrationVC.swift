@@ -247,26 +247,19 @@ class RegistrationVC: UIViewController {
             return
         }
         
-        
-        let parametes = [
-            "imei": UIDevice.UDID,
-            "fcmId": UserDefaults.standard.string(forKey: Constants.DEVICE_TOKEN_KEY) ?? "",
-            "model":UIDevice.current.model,
-            "name": userName,
-            "contact": contactNumber,
-            "firm": firmName
-        ]
-        Network.request(.addDevice, parameters: parametes) { data, response, error in
-            if error == nil, data != nil {
-                let decoder = JSONDecoder()
-                guard let apiResponse = try? decoder.decode(APIResponse.self, from: data!) else {
-                    return
-                }
-                print(apiResponse)
-            } else {
+        UserRegistrationApiCall.async(name: userName, contactNumber: contactNumber, firm: firmName) { status in
+            switch status {
+            case .sucess:
+                let reviewMessagVC = ReviewMessageVC()
+                reviewMessagVC.modalPresentationStyle = .overFullScreen
+                self.present(reviewMessagVC, animated: true)
+            case .failed:
+                self.showAlert(title: "Error!", message: "Something went wrong, Unable to registere the user.")
+            case .error:
                 self.showNetworkError()
             }
         }
+        
     }
   
     

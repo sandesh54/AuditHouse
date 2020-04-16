@@ -38,7 +38,7 @@ class NotificationCell: UITableViewCell {
     
     private let messageLabel: UILabel  = {
         let label = UILabel()
-        label.textColor = Color.darkText
+        label.textColor = .darkText
         label.numberOfLines = 0
         return label
     }()
@@ -61,7 +61,7 @@ class NotificationCell: UITableViewCell {
         let label = UILabel()
         label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 14)
-        label.textColor = Color.lightText
+        label.textColor = .lightGray
         label.adjustsFontSizeToFitWidth = true
         return label
     }()
@@ -84,13 +84,46 @@ class NotificationCell: UITableViewCell {
     override func prepareForReuse() {
     }
     
-    func loadCell() {
-        headerView.backgroundColor = .orange
-        headerLable.text = "Notification Header"
-        messageLabel.text = "A UITableViewCell object is a specialized type of view that manages the content of a single table row. You use cells primarily to organize and present your app’s custom content, but UITableViewCell provides some specific customizations to support table-related behaviors, including"
-        quickInfoLabel.text = "Expiring on: 20/12/2020"
-        viewMoreButton.setTitle("View More...", for: .normal)
-        viewMoreButton.setTitleColor(Color.darkText, for: .normal)
+    func loadCell(notification: Notifications) {
+        if notification.msg_view_sts == "N" {
+            headerView.backgroundColor = .orange
+        } else {
+            headerView.backgroundColor = .lightGray
+        }
+        headerLable.text = notification.nofification_date
+        headerLable.textAlignment = .right
+        messageLabel.text = notification.nofication_msg
+        quickInfoLabel.text = ""
+        viewMoreButton.setTitle(nil, for: .normal)
+        viewMoreButton.setTitleColor(nil, for: .normal)
+    }
+    
+    func loadCell(reminder: Reminder){
+        if reminder.msg_view_sts == "N" {
+            headerView.backgroundColor = .orange
+        } else {
+            headerView.backgroundColor = .lightGray
+        }
+         headerLable.textAlignment = .center
+        headerLable.text = reminder.reminder_name
+        messageLabel.text = reminder.reminder_desc
+        quickInfoLabel.text = "Expire On: \(reminder.reminder_end_date)"
+        viewMoreButton.setTitle(nil, for: .normal)
+        viewMoreButton.setTitleColor(nil, for: .normal)
+    }
+    
+    func loadCell(informantion: ImportantInfo) {
+        if informantion.readStat == "N" {
+            headerView.backgroundColor = .orange
+        } else {
+            headerView.backgroundColor = .lightGray
+        }
+         headerLable.textAlignment = .center
+        headerLable.text = informantion.info_title
+        messageLabel.text = informantion.info_description
+        quickInfoLabel.text = ""
+        viewMoreButton.setTitle(nil, for: .normal)
+            viewMoreButton.setTitleColor(nil, for: .normal)
     }
     
     private func setupViews() {

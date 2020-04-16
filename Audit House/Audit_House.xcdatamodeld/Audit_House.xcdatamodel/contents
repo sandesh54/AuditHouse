@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="16119" systemVersion="19E266" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="UserInfo" representedClassName="UserInfo" syncable="YES" codeGenerationType="class">
+    <entity name="OfflineData" representedClassName="OfflineData" isAbstract="YES" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="rawData" optional="YES" attributeType="String"/>
+        <attribute name="type" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="ReadStatus" representedClassName="ReadStatus" isAbstract="YES" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="type" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="UserInfo" representedClassName="UserInfo" isAbstract="YES" syncable="YES" codeGenerationType="class">
         <attribute name="approvedBy" optional="YES" attributeType="String"/>
         <attribute name="contactNumber" optional="YES" attributeType="String"/>
         <attribute name="firmName" optional="YES" attributeType="String"/>
@@ -11,6 +20,8 @@
         <attribute name="registrationDate" optional="YES" attributeType="String"/>
     </entity>
     <elements>
-        <element name="UserInfo" positionX="-63" positionY="-18" width="128" height="163"/>
+        <element name="UserInfo" positionX="-70.35546875" positionY="-153.18359375" width="128" height="163"/>
+        <element name="OfflineData" positionX="-63" positionY="45" width="128" height="88"/>
+        <element name="ReadStatus" positionX="192.60546875" positionY="-116.1484375" width="128" height="73"/>
     </elements>
 </model>

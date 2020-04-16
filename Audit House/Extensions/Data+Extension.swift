@@ -13,4 +13,16 @@ extension Data {
         let token = self.map { String(format: "%02.2hhx", $0) }.joined()
         return token
     }
+    
+    func jsonSerialized() -> [String: Any]{
+        let values: [String: Any]?
+        do {
+            values = try JSONSerialization.jsonObject(with: self, options: .allowFragments) as? [String: Any]
+        } catch {
+            print(error.localizedDescription)
+            fatalError("JSON conversion failed")
+        }
+        
+        return values == nil ? [:] : values!
+    }
 }

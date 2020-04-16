@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 struct Color {
     static let appTheme     = UIColor(red: 0.0, green: 0.85, blue: 1.0, alpha: 1.0)
@@ -15,28 +16,42 @@ struct Color {
 }
 
 
-struct Constants {
-    static let DEVICE_UDID_KEY = "deviceUDID"
+struct APIResponseMessage {
     static let DEVICE_NOT_REGISTERED_MESSAGE = "Not Registered"
     static let DEVICE_NOT_ACTIVATED_MESSAGE = "Not Activated"
+    static let SUCCESS_MESSAGE = "success"
+    static let FAILED_MESSAGE = "fail"
+    static let NO_RESULT_FOUND_MESSAGE = "No results found"
+}
+
+struct UserDefaultsKeys {
     static let DEVICE_TOKEN_KEY = "deviceToken"
-    
-    static let REGISTRATION_SUCCESS_MESSAGE = "success"
-    static let REGISTRATION_FAILED_MESSAGE = "fail"
-    
-    static let NO_INFO_FOUND_MESSAGE = "No results found"
+    static let DEVICE_UDID_KEY = "deviceUDID"
+    static let USER_INFO_KEY = "userInfo"
 }
 
 
-/*
- 
- 1: No of duplicate response not formatted
- Warning: PDOStatement::execute(): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry
- 'E9971E20-02E7-4800-B616-06A35F0661B0' for key 'device_imei_UNIQUE' in
- /var/sentora/hostdata/support/public_html/audithouse/application/model/rest.php on line 25
- 
- 2: FcmID cannot be null
- This scenarion cannot be garunteed
- 
- 3: No method is provided to update the fcm token which is possible scenario
-*/
+struct ApiResponseKeys {
+    static let STATUS = "status"
+    static let MESSAGE = "msg"
+    static let RESULT = "result"
+    static let DATA = "data"
+}
+
+struct APIResponseTypes {
+    static let INFO = "home"
+    static let REMINDERS = "reminder"
+    static let NOTIFICATION = "notification"
+}
+
+struct DataReadTypes {
+    static let HOME_INFO_READ = "impInfo"
+    static let NOTIFICATION_INFO_READ = "notification"
+    static let REMINDER_COUNT = "reminder"
+}
+
+struct Predicate {
+    static let importantInfoPredicate = NSPredicate(format: "type == %@", APIResponseTypes.INFO)
+    static let reminderPredicate = NSPredicate(format: "type == %@", APIResponseTypes.REMINDERS)
+    static let notificationPredicate = NSPredicate(format: "type == %@", APIResponseTypes.NOTIFICATION)
+}

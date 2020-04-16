@@ -7,11 +7,29 @@
 //
 
 import UIKit
+import CoreData
 
 class HomeVC: UIViewController {
+    private enum CurrentInfoType {
+        case important
+        case reminder
+        case notificaton
+    }
     
+    private var currentInfoType: CurrentInfoType?
+    private var responseData: ResponseData? {
+        didSet {
+            if responseData != nil {
+                generateUnderLyingData()
+            }
+        }
+    }
     
-    private var homeButton: BadgeButton = {
+    private var notifications: [Notifications]? { didSet { tableView.reloadData() } }
+    private var reminders: [Reminder]? { didSet { tableView.reloadData() } }
+    private var information: [ImportantInfo]? { didSet { tableView.reloadData() } }
+    
+    private var importantInfoButton: BadgeButton = {
         let button = BadgeButton()
         button.setTitle(nil, for: .normal)
         button.contentMode = .scaleAspectFit
@@ -20,7 +38,7 @@ class HomeVC: UIViewController {
         return button
     }()
     
-    private var infoButton: BadgeButton = {
+    private var remondersButton: BadgeButton = {
         let button = BadgeButton()
         button.setTitle(nil, for: .normal)
         button.contentMode = .scaleAspectFit
@@ -60,6 +78,13 @@ class HomeVC: UIViewController {
         tableView.delegate          = self
         tableView.dataSource        = self
         readCounts()
+        getInfo()
+        syncData()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+ 
     }
     
     private func configureNavigationController() {
@@ -91,7 +116,7 @@ class HomeVC: UIViewController {
             headerView.heightAnchor.constraint(equalToConstant: 50)
         ])
         
-      
+        
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -103,9 +128,8 @@ class HomeVC: UIViewController {
     }
     
     private func setupHeaderView() {
-
-        headerView.backgroundColor = Color.appTheme
         
+        headerView.backgroundColor = Color.appTheme
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.alignment = .fill
@@ -122,8 +146,8 @@ class HomeVC: UIViewController {
         ])
         
         
-        stackView.addArrangedSubview(embedInView(homeButton))
-        stackView.addArrangedSubview(embedInView(infoButton))
+        stackView.addArrangedSubview(embedInView(importantInfoButton))
+        stackView.addArrangedSubview(embedInView(remondersButton))
         stackView.addArrangedSubview(embedInView(notificationButton))
         
     }
@@ -146,96 +170,107 @@ class HomeVC: UIViewController {
     
     
     //MARK:- CLASS METHODS
+    private func generateUnderLyingData() {
+         let jsonDecoder = JSONDecoder()
+        if responseData!.type == APIResponseTypes.INFO {
+            let data = Data(responseData!.rawData!.utf8)
+            if let info = try? jsonDecoder.decode([ImportantInfo].self, from: data) {
+                information = info
+            }
+        } else if responseData!.type == APIResponseTypes.REMINDERS {
+            let data = Data(responseData!.rawData!.utf8)
+            if let info = try? jsonDecoder.decode([Reminder].self, from: data) {
+                reminders = info
+            }
+        } else if responseData!.type == APIResponseTypes.NOTIFICATION {
+            let data = Data(responseData!.rawData!.utf8)
+            if let info = try? jsonDecoder.decode([Notifications].self, from: data) {
+                notifications = info
+            }
+        }
+    }
+    
+    
     private func readCounts() {
-        let parameters = [
-            "user_id": "1"
-        ]
-        Network.request(.readCount, parameters: parameters) { data, response, error in
-            if error == nil, data != nil {
-                let decoder = JSONDecoder()
-                guard let apiResponse = try? decoder.decode(APIResponse.self, from: data!) else {
-                    return
-                }
-                print(apiResponse)
-                if apiResponse.result != nil {
-                    self.homeButton.badgeText = "\(apiResponse.result!.reminder)"
-                    self.infoButton.badgeText = apiResponse.result!.impInfo
-                    self.notificationButton.badgeText = apiResponse.result!.notification
-                }
-                self.getInfo()
-            } else {
-                self.showNetworkError()
+        ReadCountsApiCall.async { staus, info, reminder, notification in
+            switch staus {
+            case .error: self.showNetworkError()
+            case .sucess:
+                self.importantInfoButton.badgeText = info
+                self.remondersButton.badgeText = reminder
+                self.notificationButton.badgeText = notification
             }
         }
     }
     
     private func getInfo() {
-        let parameters = [
-            "imei": UIDevice.UDID
-        ]
-        Network.request(.getInfo, parameters: parameters) { data, response, error in
-            if error == nil, data != nil {
-                let decoder = JSONDecoder()
-                guard let apiResponse = try? decoder.decode(APIResponse.self, from: data!) else {
-                    //handle response failure
-                    return
+        currentInfoType = .important
+        if Reachabiility.shared.isConnectedToNetWork {
+            GetInfoApiCall.async { status, info in
+                switch status {
+                case .sucess:
+                    self.responseData = CoreData.getResponseData(predicate: Predicate.importantInfoPredicate)
+                case .error:
+                    self.showNetworkError()
                 }
-                print(apiResponse)
-                if apiResponse.msg == Constants.DEVICE_NOT_REGISTERED_MESSAGE {
-                   
-                }
-            } else {
-                self.showNetworkError()
             }
+        } else {
+            self.responseData = CoreData.getResponseData(predicate: Predicate.importantInfoPredicate)
         }
+        
     }
     
+    private func syncData() {
+        if Reachabiility.shared.isConnectedToNetWork {
+            SyncOfflineDataApiCall.async { status in
+                switch status {
+                case .sucess:
+                    self.view.makeToast("Data Synced Sucessfully")
+                case .error:
+                    self.view.makeToast("Unable.syncData")
+                case .fail:
+                    self.view.makeToast("Unable.syncData")
+                }
+            }
+        } else {
+            print("Noooo")
+        }
+        
+    }
     
     @objc private func homeButtonTapped(_ sender: UIButton) {
-       getInfo()
+        getInfo()
     }
     
     @objc private func infoButtonTapped(_ sender: UIButton) {
-        let parameters = [
-            "imei": UIDevice.UDID
-        ]
-        
-        Network.request(.getReminders, parameters: parameters) { data, response, error in
-            if error == nil, data != nil {
-                let decoder = JSONDecoder()
-                guard let apiResponse = try? decoder.decode(APIResponse.self, from: data!) else {
-                    //handle response failure
-                    return
+        currentInfoType = .reminder
+        if Reachabiility.shared.isConnectedToNetWork {
+            GetRemindersApiCall.async { status, reminders in
+                switch status {
+                case .sucess:
+                    self.responseData = CoreData.getResponseData(predicate: Predicate.reminderPredicate)
+                case .error:
+                    self.showNetworkError()
                 }
-                print(apiResponse)
-                if apiResponse.msg == Constants.DEVICE_NOT_REGISTERED_MESSAGE {
-                   
-                }
-            } else {
-                self.showNetworkError()
             }
+        } else {
+            self.responseData = CoreData.getResponseData(predicate: Predicate.reminderPredicate)
         }
     }
     
     @objc private func notificationButtonTapped(_ sender: UIButton) {
-        let parameters = [
-            "imei": UIDevice.UDID
-        ]
-        
-        Network.request(.getNotifications, parameters: parameters) { data, response, error in
-            if error == nil, data != nil {
-                let decoder = JSONDecoder()
-                guard let apiResponse = try? decoder.decode(APIResponse.self, from: data!) else {
-                    //handle response failure
-                    return
+        currentInfoType = .notificaton
+        if Reachabiility.shared.isConnectedToNetWork {
+            GetNotificationApiCall.async { status, notifications in
+                switch status {
+                case .sucess:
+                    self.responseData = CoreData.getResponseData(predicate: Predicate.notificationPredicate)
+                case .error:
+                    self.showNetworkError()
                 }
-                print(apiResponse)
-                if apiResponse.msg == Constants.DEVICE_NOT_REGISTERED_MESSAGE {
-                   
-                }
-            } else {
-                self.showNetworkError()
             }
+        } else {
+            self.responseData = CoreData.getResponseData(predicate: Predicate.notificationPredicate)
         }
     }
     
@@ -255,14 +290,30 @@ extension HomeVC: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 4
+        switch currentInfoType! {
+        case .important:
+            return information?.count ?? 0
+        case .reminder:
+            return reminders?.count ?? 0
+        case .notificaton:
+            return notifications?.count ?? 0
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard  let cell = tableView.dequeueReusableCell(withIdentifier: NotificationCell.identifier, for: indexPath) as? NotificationCell else {
             return UITableViewCell()
         }
-        cell.loadCell()
+        
+        switch currentInfoType! {
+        case .important:
+            cell.loadCell(informantion: information![indexPath.row])
+        case .reminder:
+            cell.loadCell(reminder: reminders![indexPath.row])
+        case .notificaton:
+            cell.loadCell(notification: notifications![indexPath.row])
+        }
+        
         return cell
     }
     

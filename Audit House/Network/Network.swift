@@ -7,17 +7,17 @@
 //
 
 import Foundation
-import Reachability
+import Network
 
-struct Network {
-    
+class Network {
+
     enum NetworkErrors: Error {
         case NoConnectivity
         case NotFound
         case InvalidURL
     }
     
-   
+    
     
     enum EndPoints: String {
         case addDevice = "addDevice"
@@ -31,14 +31,13 @@ struct Network {
         case crashReport = "crashReport"
     }
     
-    private static let BASE_URL = "http://support.theskygge.com/audithouse/public/rest/"
+    private let BASE_URL = "http://support.theskygge.com/audithouse/public/rest/"
     //private static let BASE_URL = "http://www.audithouse.in/rest/"
     
-    static func request( _ endpoint: EndPoints,parameters: [String: String],_ completionHandler: @escaping (Data?, URLResponse?, Error?) -> ()) {
-       
+    func request( _ endpoint: EndPoints,parameters: [[String: String]],_ completionHandler: @escaping (Data?, URLResponse?, Error?) -> ()) {
         
         guard let url = URL(string: BASE_URL+endpoint.rawValue) else {
-//            throw NetworkErrors.InvalidURL
+            //            throw NetworkErrors.InvalidURL
             fatalError("Invalid URL")
         }
         print(url.absoluteString)
@@ -49,11 +48,20 @@ struct Network {
         let session = URLSession.shared
         
         let encoder = JSONEncoder()
-        guard let data = try? encoder.encode(parameters) else {
-            fatalError("Cannot encode \(parameters)")
+        
+        if endpoint == .offlineData {
+            guard let data = try? encoder.encode(parameters) else {
+                fatalError("Cannot encode \(parameters)")
+            }
+            request.httpBody = data
+        } else {
+            guard let data = try? encoder.encode(parameters[0]) else {
+                fatalError("Cannot encode \(parameters)")
+            }
+            request.httpBody = data
         }
         
-        request.httpBody = data
+        
         
         session.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
@@ -61,7 +69,35 @@ struct Network {
             }
         }.resume()
     }
+    
+   
 }
 
 
 
+class Reachabiility {
+    var isConnectedToNetWork: Bool = true
+    
+    static let shared = Reachabiility()
+    
+    private init() {
+        print("Monitoring started")
+        startMonitoting()
+    }
+    private func startMonitoting() {
+        let monitor = NWPathMonitor()
+        monitor.pathUpdateHandler =  { path in
+            if path.status == .satisfied {
+                print("Connected")
+                self.isConnectedToNetWork = true
+            } else  {
+                print("Not Connected")
+                self.isConnectedToNetWork = false
+            }
+        }
+        
+        let queue = DispatchQueue(label: "Monitor")
+        monitor.start(queue: queue)
+    }
+    
+}

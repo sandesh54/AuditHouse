@@ -1,20 +1,20 @@
 PODS:
   - KeychainSwift (19.0.0)
-  - ReachabilitySwift (5.0.0)
+  - Toast-Swift (5.0.1)
 
 DEPENDENCIES:
   - KeychainSwift
-  - ReachabilitySwift
+  - Toast-Swift (~> 5.0.0)
 
 SPEC REPOS:
   trunk:
     - KeychainSwift
-    - ReachabilitySwift
+    - Toast-Swift
 
 SPEC CHECKSUMS:
   KeychainSwift: a06190cf933ad46b1e0abc3d77d29c06331715c7
-  ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
+  Toast-Swift: 9b6a70f28b3bf0b96c40d46c0c4b9d6639846711
 
-PODFILE CHECKSUM: 4fd7c82b9fad3e1424a17d4c6a76551a2d469a5b
+PODFILE CHECKSUM: f99a1b8da55090c01406e0c604745ee652440545
 
 COCOAPODS: 1.8.4

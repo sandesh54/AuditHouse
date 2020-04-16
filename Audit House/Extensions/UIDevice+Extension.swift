@@ -13,7 +13,7 @@ extension UIDevice {
     static var UDID: String {
         guard let udid = KeychainSwift().get("") else {
             let key = UIDevice.current.identifierForVendor!.uuidString
-            KeychainSwift().set(key, forKey: Constants.DEVICE_UDID_KEY)
+            KeychainSwift().set(key, forKey: UserDefaultsKeys.DEVICE_UDID_KEY)
             return key
         }
         return udid
