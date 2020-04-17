@@ -24,14 +24,14 @@ struct ReadInfoApiCall {
         ]
         
         Network().request(.readInfo, parameters: [parameters]) { data, response, error in
-            if let error == nil, data != nil {
+            if error == nil, data != nil {
                 let result = data!.jsonSerialized()
                 if let message = result[ApiResponseKeys.MESSAGE] as? String {
                     switch message {
-                    case <#pattern#>:
-                        <#code#>
+                    case APIResponseMessage.SUCCESS_MESSAGE:
+                        completionHandler(.sucess)
                     default:
-                        <#code#>
+                        completionHandler(.fail)
                     }
                 }
             } else {

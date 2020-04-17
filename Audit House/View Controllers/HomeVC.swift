@@ -10,11 +10,6 @@ import UIKit
 import CoreData
 
 class HomeVC: UIViewController {
-    private enum CurrentInfoType {
-        case important
-        case reminder
-        case notificaton
-    }
     
     private var currentInfoType: CurrentInfoType?
     private var responseData: ResponseData? {
@@ -38,15 +33,17 @@ class HomeVC: UIViewController {
         return button
     }()
     
-    private var remondersButton: BadgeButton = {
+    
+    private var remindersButton: BadgeButton = {
         let button = BadgeButton()
         button.setTitle(nil, for: .normal)
         button.contentMode = .scaleAspectFit
         button.setImage(UIImage(named: "info"), for: .normal)
         button.addTarget(self, action: #selector(infoButtonTapped(_:)), for: .touchUpInside)
+        button.isBadgeHidden = true
         return button
     }()
-    
+        
     private var notificationButton: BadgeButton = {
         let button = BadgeButton()
         button.setTitle(nil, for: .normal)
@@ -65,7 +62,7 @@ class HomeVC: UIViewController {
         tableView.rowHeight         = UITableView.automaticDimension
         tableView.allowsSelection   = false
         tableView.tableFooterView   = UIView()
-        tableView.register(NotificationCell.self, forCellReuseIdentifier: NotificationCell.identifier)
+        tableView.register(ResponseCell.self, forCellReuseIdentifier: ResponseCell.identifier)
         return tableView
     }()
     
@@ -82,9 +79,11 @@ class HomeVC: UIViewController {
         syncData()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(true)
- 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
+        importantInfoButton.superview?.underLine()
+        remindersButton.superview?.hideUnderLine()
+        notificationButton.superview?.hideUnderLine()
     }
     
     private func configureNavigationController() {
@@ -147,7 +146,7 @@ class HomeVC: UIViewController {
         
         
         stackView.addArrangedSubview(embedInView(importantInfoButton))
-        stackView.addArrangedSubview(embedInView(remondersButton))
+        stackView.addArrangedSubview(embedInView(remindersButton))
         stackView.addArrangedSubview(embedInView(notificationButton))
         
     }
@@ -167,6 +166,7 @@ class HomeVC: UIViewController {
         superView.backgroundColor = .clear
         return superView
     }
+
     
     
     //MARK:- CLASS METHODS
@@ -192,18 +192,25 @@ class HomeVC: UIViewController {
     
     
     private func readCounts() {
+        if Reachabiility.shared.isConnectedToNetWork {
         ReadCountsApiCall.async { staus, info, reminder, notification in
             switch staus {
             case .error: self.showNetworkError()
             case .sucess:
                 self.importantInfoButton.badgeText = info
-                self.remondersButton.badgeText = reminder
                 self.notificationButton.badgeText = notification
             }
+        }
+        } else {
+            self.importantInfoButton.badgeText = "0"
+            self.notificationButton.badgeText = "0"
         }
     }
     
     private func getInfo() {
+        
+      
+        
         currentInfoType = .important
         if Reachabiility.shared.isConnectedToNetWork {
             GetInfoApiCall.async { status, info in
@@ -233,7 +240,7 @@ class HomeVC: UIViewController {
                 }
             }
         } else {
-            print("Noooo")
+            // offline data is not synced
         }
         
     }
@@ -243,6 +250,11 @@ class HomeVC: UIViewController {
     }
     
     @objc private func infoButtonTapped(_ sender: UIButton) {
+        
+        importantInfoButton.superview?.hideUnderLine()
+        remindersButton.superview?.underLine()
+        notificationButton.superview?.hideUnderLine()
+        
         currentInfoType = .reminder
         if Reachabiility.shared.isConnectedToNetWork {
             GetRemindersApiCall.async { status, reminders in
@@ -259,6 +271,11 @@ class HomeVC: UIViewController {
     }
     
     @objc private func notificationButtonTapped(_ sender: UIButton) {
+        
+        importantInfoButton.superview?.hideUnderLine()
+        remindersButton.superview?.hideUnderLine()
+        notificationButton.superview?.underLine()
+        
         currentInfoType = .notificaton
         if Reachabiility.shared.isConnectedToNetWork {
             GetNotificationApiCall.async { status, notifications in
@@ -301,7 +318,7 @@ extension HomeVC: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard  let cell = tableView.dequeueReusableCell(withIdentifier: NotificationCell.identifier, for: indexPath) as? NotificationCell else {
+        guard  let cell = tableView.dequeueReusableCell(withIdentifier: ResponseCell.identifier, for: indexPath) as? ResponseCell else {
             return UITableViewCell()
         }
         
@@ -313,7 +330,7 @@ extension HomeVC: UITableViewDataSource {
         case .notificaton:
             cell.loadCell(notification: notifications![indexPath.row])
         }
-        
+        cell.delegate = self
         return cell
     }
     
@@ -323,5 +340,28 @@ extension HomeVC: UITableViewDataSource {
 }
 
 extension HomeVC: UITableViewDelegate {
+    
+}
+
+extension HomeVC: ResponseCellDelegate {
+    
+    func readOneMessage(type: CurrentInfoType) {
+        switch type {
+        
+        case .important:
+            guard let count = Int(importantInfoButton.badgeText) else { return }
+            importantInfoButton.badgeText = "\(count - 1)"
+        case .reminder: break
+        case .notificaton:
+            guard let count = Int(notificationButton.badgeText) else { return }
+            notificationButton.badgeText = "\(count - 1)"
+        }
+    }
+    
+    func didChangedView() {
+        tableView.beginUpdates()
+        tableView.endUpdates()
+    }
+    
     
 }

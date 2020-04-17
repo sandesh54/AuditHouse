@@ -21,6 +21,9 @@ struct GetInfoApiCall {
         ]
         Network().request(.getInfo, parameters: [parameters]) { data, response, error in
             if error == nil, data != nil {
+                // delete existing data
+                CoreData.deleteResponseData(predicate: Predicate.importantInfoPredicate)
+                
                 let result = data!.jsonSerialized()
                 if let message = result[ApiResponseKeys.MESSAGE] as? String {
                     switch  message {
@@ -33,15 +36,14 @@ struct GetInfoApiCall {
                                 
                                 let jsonDecoder = JSONDecoder()
                                 if let info  = try? jsonDecoder.decode([ImportantInfo].self, from: userData){
-                                    // delete existing data
-                                    CoreData.deleteResponseData(predicate: Predicate.importantInfoPredicate)
                                     // save new data
                                     let impInfo = ResponseData(context: CoreData.context)
                                     impInfo.rawData = String(data: userData, encoding: .utf8)
                                     impInfo.type = APIResponseTypes.INFO
                                     do { try CoreData.context.save() }
                                     catch {print("CORE DATA SAVE FAILED \(error.localizedDescription)")}
-                                    
+                                    print(info)
+
                                     completionHandler(.sucess, info)
                                 }
                                 completionHandler(.sucess,[])

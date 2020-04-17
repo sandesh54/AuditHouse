@@ -114,6 +114,7 @@ class AboutUsVC: UIViewController {
     private func setupScrollView() {
         let imageView = UIImageView(image: UIImage(named: "logo"))
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
         baseScrollView.addSubview(imageView)
         
         NSLayoutConstraint.activate([

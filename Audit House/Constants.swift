@@ -55,3 +55,11 @@ struct Predicate {
     static let reminderPredicate = NSPredicate(format: "type == %@", APIResponseTypes.REMINDERS)
     static let notificationPredicate = NSPredicate(format: "type == %@", APIResponseTypes.NOTIFICATION)
 }
+
+
+enum CurrentInfoType {
+      case important
+      case reminder
+      case notificaton
+  }
+  

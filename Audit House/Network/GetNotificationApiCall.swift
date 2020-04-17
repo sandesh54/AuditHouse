@@ -20,6 +20,8 @@ struct GetNotificationApiCall {
         ]
         Network().request(.getNotifications, parameters: [parameters]) { data, response, error in
             if error == nil, data != nil {
+                // delete existing data
+                CoreData.deleteResponseData(predicate: Predicate.notificationPredicate)
                 let result = data!.jsonSerialized()
                 if let message = result[ApiResponseKeys.MESSAGE] as? String {
                     switch  message {
@@ -31,8 +33,6 @@ struct GetNotificationApiCall {
                                 let userData  = try JSONSerialization.data(withJSONObject: responseArray, options: .fragmentsAllowed)
                                 let jsonDecoder = JSONDecoder()
                                 if let notification  = try? jsonDecoder.decode([Notifications].self, from: userData) {
-                                    // delete existing data
-                                    CoreData.deleteResponseData(predicate: Predicate.notificationPredicate)
                                     // save new data
                                     let notificationRespose = ResponseData(context: CoreData.context)
                                     notificationRespose.rawData = String(data: userData, encoding: .utf8)

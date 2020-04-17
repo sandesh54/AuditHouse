@@ -20,4 +20,17 @@ extension UIView {
         self.makeToast("Message", duration: TimeInterval(1.5), style: style)
     }
     
+    
+    func underLine() {
+        let view = UIView(frame: CGRect(x: 0, y: CGFloat(self.bounds.height-2), width: self.bounds.width, height: 2))
+        view.backgroundColor = .orange
+        view.tag = 989
+        addSubview(view)
+    }
+    
+    func hideUnderLine() {
+        for view in subviews {
+            if view.tag == 989 { view.removeFromSuperview() }
+        }
+    }
 }

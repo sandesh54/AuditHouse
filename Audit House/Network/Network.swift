@@ -19,6 +19,8 @@ class Network {
     
     
     
+
+    
     enum EndPoints: String {
         case addDevice = "addDevice"
         case checkDevice = "checkDevice"

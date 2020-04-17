@@ -247,19 +247,23 @@ class RegistrationVC: UIViewController {
             return
         }
         
-        UserRegistrationApiCall.async(name: userName, contactNumber: contactNumber, firm: firmName) { status in
-            switch status {
-            case .sucess:
-                let reviewMessagVC = ReviewMessageVC()
-                reviewMessagVC.modalPresentationStyle = .overFullScreen
-                self.present(reviewMessagVC, animated: true)
-            case .failed:
-                self.showAlert(title: "Error!", message: "Something went wrong, Unable to registere the user.")
-            case .error:
-                self.showNetworkError()
+        if Reachabiility.shared.isConnectedToNetWork {
+            UserRegistrationApiCall.async(name: userName, contactNumber: contactNumber, firm: firmName) { status in
+                switch status {
+                case .sucess:
+                    let reviewMessagVC = ReviewMessageVC()
+                    reviewMessagVC.modalPresentationStyle = .overFullScreen
+                    self.present(reviewMessagVC, animated: true)
+                case .failed:
+                    self.showAlert(title: "Error!", message: "Something went wrong, Unable to registere the user.")
+                case .error:
+                    self.showNetworkError()
+                }
             }
+            
+        } else {
+            showNetworkError()
         }
-        
     }
   
     

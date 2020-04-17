@@ -22,6 +22,7 @@ struct CheckDeviceApiCall {
             "fcmId": UserDefaults.standard.string(forKey: UserDefaultsKeys.DEVICE_TOKEN_KEY) ?? ""
         ]
         
+        print(parameters)
         Network().request(.checkDevice, parameters: [parameters]) { data, response, error in
             if error == nil, data != nil {
                 let result = data!.jsonSerialized()

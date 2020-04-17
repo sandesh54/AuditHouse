@@ -8,14 +8,27 @@
 
 import UIKit
 
-class NotificationCell: UITableViewCell {
+protocol ResponseCellDelegate {
+    func didChangedView()
+    func readOneMessage(type: CurrentInfoType)
+}
+
+
+class ResponseCell: UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-         addShadowLayer()
+        addShadowLayer()
     }
+    private var info: ImportantInfo?
+    private var reminder: Reminder?
+    private var notification: Notifications?
+    private var type: CurrentInfoType?
     
     static let identifier = "NotoficationCell"
+    
+    var delegate: ResponseCellDelegate?
+    
     private var headerLable: UILabel = {
         let label                       = UILabel()
         label.textColor                 = .white
@@ -39,13 +52,13 @@ class NotificationCell: UITableViewCell {
     private let messageLabel: UILabel  = {
         let label = UILabel()
         label.textColor = .darkText
-        label.numberOfLines = 0
+        label.numberOfLines = 3
+        label.lineBreakMode = .byTruncatingTail
         return label
     }()
     
     private let seenButton: UIButton = {
         let button = UIButton()
-        button.setTitle(nil, for: .normal)
         return button
     }()
     
@@ -71,6 +84,8 @@ class NotificationCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupViews()
         selectionStyle = .none
+        viewMoreButton.addTarget(self, action: #selector(markAsRead(_:)), for: .touchUpInside)
+
     }
     
     required init?(coder: NSCoder) {
@@ -85,45 +100,125 @@ class NotificationCell: UITableViewCell {
     }
     
     func loadCell(notification: Notifications) {
+        
+        type = .notificaton
+        self.notification = notification
+        self.reminder = nil
+        self.info = nil
+        messageLabel.numberOfLines = 3
+        
+        viewMoreButton.setTitleColor(.black, for: .normal)
         if notification.msg_view_sts == "N" {
             headerView.backgroundColor = .orange
+            seenButton.setImage(UIImage(named: "unread"), for: .normal)
         } else {
             headerView.backgroundColor = .lightGray
+            seenButton.setImage(UIImage(named: "read"), for: .normal)
         }
         headerLable.text = notification.nofification_date
         headerLable.textAlignment = .right
         messageLabel.text = notification.nofication_msg
         quickInfoLabel.text = ""
-        viewMoreButton.setTitle(nil, for: .normal)
-        viewMoreButton.setTitleColor(nil, for: .normal)
     }
     
     func loadCell(reminder: Reminder){
+        
+        type = .reminder
+        self.notification = nil
+        self.reminder = reminder
+        self.info = nil
+        messageLabel.numberOfLines = 3
+        
+        viewMoreButton.setTitleColor(.black, for: .normal)
         if reminder.msg_view_sts == "N" {
             headerView.backgroundColor = .orange
+            seenButton.setImage(UIImage(named: "unread"), for: .normal)
         } else {
             headerView.backgroundColor = .lightGray
+            seenButton.setImage(UIImage(named: "read"), for: .normal)
         }
-         headerLable.textAlignment = .center
+        headerLable.textAlignment = .center
         headerLable.text = reminder.reminder_name
         messageLabel.text = reminder.reminder_desc
         quickInfoLabel.text = "Expire On: \(reminder.reminder_end_date)"
-        viewMoreButton.setTitle(nil, for: .normal)
-        viewMoreButton.setTitleColor(nil, for: .normal)
     }
     
     func loadCell(informantion: ImportantInfo) {
+        
+        type = .important
+        self.notification = nil
+        self.reminder = nil
+        self.info = informantion
+        messageLabel.numberOfLines = 3
+        
+        viewMoreButton.setTitleColor(.black, for: .normal)
         if informantion.readStat == "N" {
             headerView.backgroundColor = .orange
+            seenButton.setImage(UIImage(named: "unread"), for: .normal)
         } else {
             headerView.backgroundColor = .lightGray
-        }
-         headerLable.textAlignment = .center
+            seenButton.setImage(UIImage(named: "read"), for: .normal)
+       }
+        headerLable.textAlignment = .center
         headerLable.text = informantion.info_title
         messageLabel.text = informantion.info_description
         quickInfoLabel.text = ""
-        viewMoreButton.setTitle(nil, for: .normal)
-            viewMoreButton.setTitleColor(nil, for: .normal)
+        
+        
+    }
+    
+    @objc private func markAsRead(_ sender: UIButton) {
+        self.messageLabel.numberOfLines = 0
+        delegate?.didChangedView()
+ 
+        var id = ""
+        var readType = ""
+        let readInfo = ReadStatus(context: CoreData.context)
+        
+        switch type! {
+
+        case .important:
+            guard let information = info, information.readStat == "N" else { return }
+            
+            id = information.line_id
+            readType = DataReadTypes.HOME_INFO_READ
+            readInfo.id = information.line_id
+            readInfo.type = DataReadTypes.HOME_INFO_READ
+            
+        case .reminder:
+            
+            guard let remind = reminder, remind.msg_view_sts == "N" else { return }
+            
+            id =  remind.reminder_id
+            readType = DataReadTypes.REMINDER_COUNT
+            readInfo.id = reminder?.reminder_id
+            readInfo.type =  DataReadTypes.REMINDER_COUNT
+            
+        case .notificaton:
+            
+            guard let noti = notification, noti.msg_view_sts == "N" else { return }
+            
+            id = noti.notification_id
+            readType = DataReadTypes.NOTIFICATION_INFO_READ
+            readInfo.id = notification?.notification_id
+            readInfo.type = DataReadTypes.NOTIFICATION_INFO_READ
+        }
+        
+        if Reachabiility.shared.isConnectedToNetWork {
+            ReadInfoApiCall.async(id: id, type: readType) { status in
+                switch status {
+                    
+                case .sucess:
+                    self.delegate?.readOneMessage(type: self.type!)
+                case .error:
+                    try? CoreData.context.save()
+                case .fail:
+                    try? CoreData.context.save()
+                }
+            }
+        } else {
+            try? CoreData.context.save()
+        }
     }
     
     private func setupViews() {
@@ -166,6 +261,8 @@ class NotificationCell: UITableViewCell {
     func addShadowLayer() {
         cardView.layer.cornerRadius = 8
         cardView.clipsToBounds = true
+        
+        subviews.first?.removeFromSuperview()
         
         let shadowView = UIView(frame: cardView.bounds)
         shadowView.layer.cornerRadius = 8
@@ -212,6 +309,7 @@ class NotificationCell: UITableViewCell {
     
     private func setupAndGetFooterView() -> UIView {
         let footerView = UIView()
+        footerView.isUserInteractionEnabled = true
         
         footerView.addSubview(seenButton)
         seenButton.translatesAutoresizingMaskIntoConstraints = false
@@ -232,7 +330,7 @@ class NotificationCell: UITableViewCell {
             viewMoreButton.trailingAnchor.constraint(equalTo: footerView.trailingAnchor),
             viewMoreButton.bottomAnchor.constraint(equalTo: footerView.bottomAnchor),
             viewMoreButton.heightAnchor.constraint(equalToConstant: 40),
-            viewMoreButton.widthAnchor.constraint(equalToConstant: 80)
+            viewMoreButton.widthAnchor.constraint(equalToConstant: 100)
         ])
         
         footerView.addSubview(quickInfoLabel)
@@ -244,8 +342,6 @@ class NotificationCell: UITableViewCell {
             quickInfoLabel.trailingAnchor.constraint(equalTo: viewMoreButton.leadingAnchor),
             quickInfoLabel.bottomAnchor.constraint(equalTo: footerView.bottomAnchor),
         ])
-        
-        
         
         return footerView
     }
