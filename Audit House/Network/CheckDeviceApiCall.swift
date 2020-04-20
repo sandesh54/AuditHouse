@@ -32,11 +32,14 @@ struct CheckDeviceApiCall {
                     } else if message == APIResponseMessage.DEVICE_NOT_ACTIVATED_MESSAGE {
                         completionHandler(.notActivated)
                     }else if message == APIResponseMessage.SUCCESS_MESSAGE {
-                        if let userData = result[ApiResponseKeys.DATA] as? Data {
+                        if let userDataDict = result[ApiResponseKeys.DATA] as? [String: Any]{
+                            if let userData = try? JSONSerialization.data(withJSONObject: userDataDict, options: .fragmentsAllowed) {
                             let jsonDecoder = JSONDecoder()
-                            if let _ = try? jsonDecoder.decode(User.self, from: userData){
+                            if let user = try? jsonDecoder.decode(User.self, from: userData){
+                                print(user)
                                 UserDefaults.standard.set(userData, forKey: UserDefaultsKeys.USER_INFO_KEY)
                             }
+                        }
                         }
                         completionHandler(.success)
                     }

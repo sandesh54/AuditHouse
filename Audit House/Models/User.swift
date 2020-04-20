@@ -26,7 +26,7 @@ struct User: Codable {
     var device_imei: String
     var device_msg_key: String?
     var device_model: String
-    var customer_id: String?
+    var customer_id: String
     var customer_name: String
     var customer_contact: String
     var firm_name: String

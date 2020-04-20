@@ -74,6 +74,7 @@ class HomeVC: UIViewController {
         tableView.separatorStyle    = .none
         tableView.delegate          = self
         tableView.dataSource        = self
+        
         readCounts()
         getInfo()
         syncData()
@@ -89,11 +90,19 @@ class HomeVC: UIViewController {
     private func configureNavigationController() {
         navigationController?.setNavigationBarHidden(false, animated: true)
         navigationItem.hidesBackButton = true
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = Color.appTheme
-        appearance.shadowColor = nil
-        navigationItem.standardAppearance = appearance
+        if #available(iOS 13.0, *) {
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = Color.appTheme
+            appearance.shadowColor = nil
+            navigationItem.standardAppearance = appearance
+        } else {
+            // Fallback on earlier versions
+            navigationController?.navigationBar.backgroundColor = Color.appTheme
+            navigationController?.navigationBar.isTranslucent = false
+            navigationController?.navigationBar.shadowImage = nil
+        }
+       
         navigationController?.navigationBar.tintColor = .white
         
         let label = UILabel()
@@ -144,7 +153,6 @@ class HomeVC: UIViewController {
             stackView.rightAnchor.constraint(equalTo: headerView.rightAnchor, constant: 0)
         ])
         
-        
         stackView.addArrangedSubview(embedInView(importantInfoButton))
         stackView.addArrangedSubview(embedInView(remindersButton))
         stackView.addArrangedSubview(embedInView(notificationButton))
@@ -190,6 +198,26 @@ class HomeVC: UIViewController {
         }
     }
     
+    private func getCountForOf(response: ResponseData?) {
+            let jsonDecoder = JSONDecoder()
+           if response?.type == APIResponseTypes.INFO {
+               let data = Data(responseData!.rawData!.utf8)
+               if let info = try? jsonDecoder.decode([ImportantInfo].self, from: data) {
+                    importantInfoButton.badgeText  = "\(info.count)"
+               }
+           } else if response?.type == APIResponseTypes.REMINDERS {
+               let data = Data(responseData!.rawData!.utf8)
+               if let info = try? jsonDecoder.decode([Reminder].self, from: data) {
+                    remindersButton.badgeText  = "\(info.count)"
+               }
+           } else if response?.type == APIResponseTypes.NOTIFICATION {
+               let data = Data(responseData!.rawData!.utf8)
+               if let info = try? jsonDecoder.decode([Notifications].self, from: data) {
+                    notificationButton.badgeText  = "\(info.count)"
+               }
+           }
+       }
+    
     
     private func readCounts() {
         if Reachabiility.shared.isConnectedToNetWork {
@@ -202,18 +230,19 @@ class HomeVC: UIViewController {
             }
         }
         } else {
-            self.importantInfoButton.badgeText = "0"
-            self.notificationButton.badgeText = "0"
+            let importantInfo = CoreData.getResponseData(predicate: Predicate.importantInfoPredicate)
+            getCountForOf(response: importantInfo)
+            let notification = CoreData.getResponseData(predicate: Predicate.notificationPredicate)
+            getCountForOf(response: notification)
         }
     }
     
     private func getInfo() {
-        
-      
-        
+        showActivityIndicator()
         currentInfoType = .important
         if Reachabiility.shared.isConnectedToNetWork {
             GetInfoApiCall.async { status, info in
+                self.hideActivityIndicator()
                 switch status {
                 case .sucess:
                     self.responseData = CoreData.getResponseData(predicate: Predicate.importantInfoPredicate)
@@ -222,7 +251,8 @@ class HomeVC: UIViewController {
                 }
             }
         } else {
-            self.responseData = CoreData.getResponseData(predicate: Predicate.importantInfoPredicate)
+            responseData = CoreData.getResponseData(predicate: Predicate.importantInfoPredicate)
+            hideActivityIndicator()
         }
         
     }
@@ -250,14 +280,14 @@ class HomeVC: UIViewController {
     }
     
     @objc private func infoButtonTapped(_ sender: UIButton) {
-        
+        showActivityIndicator()
         importantInfoButton.superview?.hideUnderLine()
         remindersButton.superview?.underLine()
         notificationButton.superview?.hideUnderLine()
-        
         currentInfoType = .reminder
         if Reachabiility.shared.isConnectedToNetWork {
             GetRemindersApiCall.async { status, reminders in
+                self.hideActivityIndicator()
                 switch status {
                 case .sucess:
                     self.responseData = CoreData.getResponseData(predicate: Predicate.reminderPredicate)
@@ -267,11 +297,12 @@ class HomeVC: UIViewController {
             }
         } else {
             self.responseData = CoreData.getResponseData(predicate: Predicate.reminderPredicate)
+            hideActivityIndicator()
         }
     }
     
     @objc private func notificationButtonTapped(_ sender: UIButton) {
-        
+        showActivityIndicator()
         importantInfoButton.superview?.hideUnderLine()
         remindersButton.superview?.hideUnderLine()
         notificationButton.superview?.underLine()
@@ -279,6 +310,7 @@ class HomeVC: UIViewController {
         currentInfoType = .notificaton
         if Reachabiility.shared.isConnectedToNetWork {
             GetNotificationApiCall.async { status, notifications in
+                self.hideActivityIndicator()
                 switch status {
                 case .sucess:
                     self.responseData = CoreData.getResponseData(predicate: Predicate.notificationPredicate)
@@ -288,6 +320,7 @@ class HomeVC: UIViewController {
             }
         } else {
             self.responseData = CoreData.getResponseData(predicate: Predicate.notificationPredicate)
+            hideActivityIndicator()
         }
     }
     
@@ -349,11 +382,11 @@ extension HomeVC: ResponseCellDelegate {
         switch type {
         
         case .important:
-            guard let count = Int(importantInfoButton.badgeText) else { return }
+            guard let count = Int(importantInfoButton.badgeText), count > 0 else { return }
             importantInfoButton.badgeText = "\(count - 1)"
         case .reminder: break
         case .notificaton:
-            guard let count = Int(notificationButton.badgeText) else { return }
+            guard let count = Int(notificationButton.badgeText), count > 0 else { return }
             notificationButton.badgeText = "\(count - 1)"
         }
     }

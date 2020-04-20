@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Toast_Swift
 
 extension UIViewController {
     
@@ -32,6 +33,14 @@ extension UIViewController {
     
     func showNetworkError() {
          showAlert(title: "Error!", message: "Something went wrong, please check your internet connection or try after some time.")
+    }
+    
+    func showActivityIndicator() {
+        self.view.makeToastActivity(.center)
+    }
+    
+    func hideActivityIndicator() {
+        self.view.hideToastActivity()
     }
     
 }

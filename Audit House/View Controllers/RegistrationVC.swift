@@ -248,7 +248,9 @@ class RegistrationVC: UIViewController {
         }
         
         if Reachabiility.shared.isConnectedToNetWork {
+            showActivityIndicator()
             UserRegistrationApiCall.async(name: userName, contactNumber: contactNumber, firm: firmName) { status in
+                self.hideActivityIndicator()
                 switch status {
                 case .sucess:
                     let reviewMessagVC = ReviewMessageVC()
@@ -262,6 +264,7 @@ class RegistrationVC: UIViewController {
             }
             
         } else {
+            hideActivityIndicator()
             showNetworkError()
         }
     }
