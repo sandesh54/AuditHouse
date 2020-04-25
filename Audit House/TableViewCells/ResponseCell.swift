@@ -67,6 +67,7 @@ class ResponseCell: UITableViewCell {
         button.setTitle("View More...", for: .normal)
         button.setImage(nil, for: .normal)
         button.titleLabel?.adjustsFontSizeToFitWidth = true
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 13)
         return button
     }()
     
@@ -85,7 +86,6 @@ class ResponseCell: UITableViewCell {
         setupViews()
         selectionStyle = .none
         viewMoreButton.addTarget(self, action: #selector(markAsRead(_:)), for: .touchUpInside)
-
     }
     
     required init?(coder: NSCoder) {
@@ -97,6 +97,7 @@ class ResponseCell: UITableViewCell {
     }
     
     override func prepareForReuse() {
+        headerView.backgroundColor = Color.lightText
     }
     
     func loadCell(notification: Notifications) {
@@ -112,7 +113,7 @@ class ResponseCell: UITableViewCell {
             headerView.backgroundColor = .orange
             seenButton.setImage(UIImage(named: "unread"), for: .normal)
         } else {
-            headerView.backgroundColor = .lightGray
+            headerView.backgroundColor = Color.lightText
             seenButton.setImage(UIImage(named: "read"), for: .normal)
         }
         headerLable.text = notification.nofification_date
@@ -134,7 +135,7 @@ class ResponseCell: UITableViewCell {
             headerView.backgroundColor = .orange
             seenButton.setImage(UIImage(named: "unread"), for: .normal)
         } else {
-            headerView.backgroundColor = .lightGray
+            headerView.backgroundColor = Color.lightText
             seenButton.setImage(UIImage(named: "read"), for: .normal)
         }
         headerLable.textAlignment = .center
@@ -156,7 +157,7 @@ class ResponseCell: UITableViewCell {
             headerView.backgroundColor = .orange
             seenButton.setImage(UIImage(named: "unread"), for: .normal)
         } else {
-            headerView.backgroundColor = .lightGray
+            headerView.backgroundColor = Color.lightText
             seenButton.setImage(UIImage(named: "read"), for: .normal)
        }
         headerLable.textAlignment = .center
@@ -168,7 +169,18 @@ class ResponseCell: UITableViewCell {
     }
     
     @objc private func markAsRead(_ sender: UIButton) {
+        
+        if messageLabel.numberOfLines == 0 {
+            messageLabel.numberOfLines = 3
+            viewMoreButton.setTitle("View More...", for: .normal)
+            delegate?.didChangedView()
+            return
+        }
+        
         self.messageLabel.numberOfLines = 0
+        self.viewMoreButton.setTitle("View Less", for: .normal)
+        self.seenButton.setImage(UIImage(named: "read"), for: .normal)
+        self.headerView.backgroundColor = Color.lightText
         delegate?.didChangedView()
  
         var id = ""
@@ -259,13 +271,13 @@ class ResponseCell: UITableViewCell {
     
     
     func addShadowLayer() {
-        cardView.layer.cornerRadius = 8
+        cardView.layer.cornerRadius = 4
         cardView.clipsToBounds = true
         
         subviews.first?.removeFromSuperview()
         
         let shadowView = UIView(frame: cardView.bounds)
-        shadowView.layer.cornerRadius = 8
+        shadowView.layer.cornerRadius = 4
         insertSubview(shadowView, at: 0)
         shadowView.center = cardView.center
         

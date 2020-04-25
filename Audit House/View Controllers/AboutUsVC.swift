@@ -112,7 +112,7 @@ class AboutUsVC: UIViewController {
     }
     
     private func setupScrollView() {
-        let imageView = UIImageView(image: UIImage(named: "logo"))
+        let imageView = UIImageView(image: UIImage(named: "LogoCircle"))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
         baseScrollView.addSubview(imageView)

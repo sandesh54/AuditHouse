@@ -90,14 +90,19 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        
+        let message = notification.request.content.body
+        _ = PushNotification(message)
         completionHandler(.sound)
     }
     
-    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        guard let aps = userInfo["aps"] as? [String: AnyObject] else {
-            return
-        }
-        _ = PushNotification(notification: aps)
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        
+        let message = response.notification.request.content.body
+         _ = PushNotification(message)
+        print("Tapped")
+        completionHandler()
     }
 }
 

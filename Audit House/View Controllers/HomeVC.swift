@@ -78,6 +78,12 @@ class HomeVC: UIViewController {
         
         readCounts()
         syncData()
+        currentInfoType = .reminder
+        
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
         
         if UserDefaults.standard.bool(forKey: UserDefaultsKeys.SHOW_NOTIFICATION_TAB) {
             showNotificationTab()
@@ -85,13 +91,7 @@ class HomeVC: UIViewController {
         } else {
             getInfo()
         }
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(true)
-        importantInfoButton.superview?.underLine()
-        remindersButton.superview?.hideUnderLine()
-        notificationButton.superview?.hideUnderLine()
+        
         
         
         UNUserNotificationCenter.current().getNotificationSettings { settings in
@@ -108,6 +108,7 @@ class HomeVC: UIViewController {
         removeNotificationObserver()
     }
     
+    //MARK:- PUSH NOTIFICATION HANDLING
     private func addNotificationObserver() {
         NotificationCenter.default.addObserver(self, selector: #selector(recievedNotification), name: .NewNotification, object: nil)
     }
@@ -116,13 +117,14 @@ class HomeVC: UIViewController {
         NotificationCenter.default.removeObserver(self, name: .NewNotification, object: nil)
     }
     
-    @objc private func recievedNotification(_ notificatin: Notification) {
-        if let noti = notificatin.userInfo?["Notfication"] as? PushNotification {
+    @objc private func recievedNotification(_ notification: Notification) {
+        if let noti = notification.userInfo?["Notfication"] as? PushNotification {
             showAlert(title: "Notification", message: noti.message)
             UserDefaults.standard.set(false, forKey: UserDefaultsKeys.SHOW_NOTIFICATION_TAB)
         }
     }
     
+    //MARK:- NAVIGATIONBAR CONFIGURATION
     private func configureNavigationController() {
         navigationController?.setNavigationBarHidden(false, animated: true)
         navigationItem.hidesBackButton = true
@@ -135,20 +137,23 @@ class HomeVC: UIViewController {
         } else {
             // Fallback on earlier versions
             navigationController?.navigationBar.backgroundColor = Color.appTheme
+            navigationController?.navigationBar.barTintColor = Color.appTheme
+            navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
             navigationController?.navigationBar.isTranslucent = false
-            navigationController?.navigationBar.shadowImage = nil
+            navigationController?.navigationBar.shadowImage = UIImage()
         }
-       
         navigationController?.navigationBar.tintColor = .white
-        
+
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 20, weight: .semibold)
         label.textColor = .white
         label.text = "Audit House"
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: label)
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "About Us", style: .plain, target: self, action: #selector(showAboutUs))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "support"), style: .plain, target: self, action: #selector(showAboutUs))
+            
     }
     
+    //MARK:- SETTING UP SUBVIEWS
     private func setupView() {
         setupHeaderView()
         view.addSubview(headerView)
@@ -275,6 +280,11 @@ class HomeVC: UIViewController {
     
     private func getInfo() {
         showActivityIndicator()
+        
+        importantInfoButton.superview?.underLine()
+        remindersButton.superview?.hideUnderLine()
+        notificationButton.superview?.hideUnderLine()
+        
         currentInfoType = .important
         if Reachabiility.shared.isConnectedToNetWork {
             GetInfoApiCall.async { status, info in

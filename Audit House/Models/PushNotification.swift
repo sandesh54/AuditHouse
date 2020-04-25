@@ -22,4 +22,11 @@ struct PushNotification {
         NotificationCenter.default.post(name: .NewNotification, object: nil, userInfo: ["Notfication": self])
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.SHOW_NOTIFICATION_TAB)
     }
+    
+    init(_ message: String) {
+        self.message = message
+        NotificationCenter.default.post(name: .NewNotification, object: nil, userInfo: ["Notfication": self])
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.SHOW_NOTIFICATION_TAB)
+    }
+    
 }
