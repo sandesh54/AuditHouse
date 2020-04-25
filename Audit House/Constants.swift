@@ -28,6 +28,7 @@ struct UserDefaultsKeys {
     static let DEVICE_TOKEN_KEY = "deviceToken"
     static let DEVICE_UDID_KEY = "deviceUDID"
     static let USER_INFO_KEY = "userInfo"
+    static let SHOW_NOTIFICATION_TAB = "showNotitficationTab"
 }
 
 

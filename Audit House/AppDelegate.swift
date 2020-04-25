@@ -13,17 +13,17 @@ import UserNotifications
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
+    var window: UIWindow?
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         _ = Reachabiility.shared
-        application.registerForRemoteNotifications()
-        UNUserNotificationCenter.current().delegate = self
+        requestForPushNotificationPermission()
+        //handle notification is app was not in running state
+        handleNotification(with: launchOptions)
         return true
     }
 
-   
-
     // MARK: - Core Data stack
-
     lazy var persistentContainer: NSPersistentContainer = {
 
         let container = NSPersistentContainer(name: "AuditHouse")
@@ -49,21 +49,55 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
-    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        let token = deviceToken.tokenString
-        print("Push Notification Token: \(token)")
-        UserDefaults.standard.set(token, forKey: UserDefaultsKeys.DEVICE_TOKEN_KEY)
+    private func requestForPushNotificationPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert,.sound]){ status, error in
+            if error == nil {
+                switch status {
+                case true:
+                    print("Permisiion Granted")
+                    DispatchQueue.main.async {
+                        UIApplication.shared.registerForRemoteNotifications()
+                    }
+                    UNUserNotificationCenter.current().delegate = self
+                case false: print("Permission Denied")
+                }
+            }
+        }
+    }
+    
+    private func handleNotification(with launchOptions: [UIApplication.LaunchOptionsKey: Any]?) {
+        // Check if launched from notification
+        let notificationOption = launchOptions?[.remoteNotification]
+        if let notification = notificationOption as? [String: AnyObject], let aps = notification["aps"] as? [String: AnyObject] {
+            _ = PushNotification(notification: aps)
+        }
     }
 }
 
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        
+    
+    
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        let token = deviceToken.tokenString
+        print("Push Notification Token: \(token)")
+        UserDefaults.standard.set(token, forKey: UserDefaultsKeys.DEVICE_TOKEN_KEY)
+        CheckDeviceApiCall.async { _ in }
     }
     
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("Failed to register to push notification => \(error.localizedDescription)")
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler(.sound)
+    }
+    
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        guard let aps = userInfo["aps"] as? [String: AnyObject] else {
+            return
+        }
+        _ = PushNotification(notification: aps)
     }
 }
 

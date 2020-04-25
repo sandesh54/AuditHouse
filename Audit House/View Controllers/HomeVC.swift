@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import UserNotifications
 
 class HomeVC: UIViewController {
     
@@ -76,8 +77,14 @@ class HomeVC: UIViewController {
         tableView.dataSource        = self
         
         readCounts()
-        getInfo()
         syncData()
+        
+        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.SHOW_NOTIFICATION_TAB) {
+            showNotificationTab()
+            UserDefaults.standard.set(false, forKey: UserDefaultsKeys.SHOW_NOTIFICATION_TAB)
+        } else {
+            getInfo()
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -85,6 +92,35 @@ class HomeVC: UIViewController {
         importantInfoButton.superview?.underLine()
         remindersButton.superview?.hideUnderLine()
         notificationButton.superview?.hideUnderLine()
+        
+        
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            if settings.authorizationStatus == .denied {
+                self.showAlert(title: "Permission Required", message: "Looks like you have denied us permission to send Notification. Please allow us to sent you notification to keep you updated with latest updates")
+            }
+        }
+        
+        addNotificationObserver()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        removeNotificationObserver()
+    }
+    
+    private func addNotificationObserver() {
+        NotificationCenter.default.addObserver(self, selector: #selector(recievedNotification), name: .NewNotification, object: nil)
+    }
+    
+    private func removeNotificationObserver() {
+        NotificationCenter.default.removeObserver(self, name: .NewNotification, object: nil)
+    }
+    
+    @objc private func recievedNotification(_ notificatin: Notification) {
+        if let noti = notificatin.userInfo?["Notfication"] as? PushNotification {
+            showAlert(title: "Notification", message: noti.message)
+            UserDefaults.standard.set(false, forKey: UserDefaultsKeys.SHOW_NOTIFICATION_TAB)
+        }
     }
     
     private func configureNavigationController() {
@@ -254,7 +290,30 @@ class HomeVC: UIViewController {
             responseData = CoreData.getResponseData(predicate: Predicate.importantInfoPredicate)
             hideActivityIndicator()
         }
+    }
+    
+    
+    private func showNotificationTab() {
+        showActivityIndicator()
+        importantInfoButton.superview?.hideUnderLine()
+        remindersButton.superview?.hideUnderLine()
+        notificationButton.superview?.underLine()
         
+        currentInfoType = .notificaton
+        if Reachabiility.shared.isConnectedToNetWork {
+            GetNotificationApiCall.async { status, notifications in
+                self.hideActivityIndicator()
+                switch status {
+                case .sucess:
+                    self.responseData = CoreData.getResponseData(predicate: Predicate.notificationPredicate)
+                case .error:
+                    self.showNetworkError()
+                }
+            }
+        } else {
+            self.responseData = CoreData.getResponseData(predicate: Predicate.notificationPredicate)
+            hideActivityIndicator()
+        }
     }
     
     private func syncData() {
@@ -302,26 +361,7 @@ class HomeVC: UIViewController {
     }
     
     @objc private func notificationButtonTapped(_ sender: UIButton) {
-        showActivityIndicator()
-        importantInfoButton.superview?.hideUnderLine()
-        remindersButton.superview?.hideUnderLine()
-        notificationButton.superview?.underLine()
-        
-        currentInfoType = .notificaton
-        if Reachabiility.shared.isConnectedToNetWork {
-            GetNotificationApiCall.async { status, notifications in
-                self.hideActivityIndicator()
-                switch status {
-                case .sucess:
-                    self.responseData = CoreData.getResponseData(predicate: Predicate.notificationPredicate)
-                case .error:
-                    self.showNetworkError()
-                }
-            }
-        } else {
-            self.responseData = CoreData.getResponseData(predicate: Predicate.notificationPredicate)
-            hideActivityIndicator()
-        }
+        showNotificationTab()
     }
     
     @objc private func showAboutUs() {
