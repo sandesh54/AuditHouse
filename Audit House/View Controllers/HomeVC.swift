@@ -445,6 +445,4 @@ extension HomeVC: ResponseCellDelegate {
         tableView.beginUpdates()
         tableView.endUpdates()
     }
-    
-    
 }
